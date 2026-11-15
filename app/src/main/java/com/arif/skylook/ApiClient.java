@@ -47,15 +47,25 @@ public class ApiClient {
                         double latitude = item.optDouble("latitude", 0);
                         double longitude = item.optDouble("longitude", 0);
                         cities.add(new City(name, country, latitude, longitude));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return cities;
+    }
+
     public static List<HourlyWeather> getHourlyWeather(double latitude, double longitude, String timezone) {
         List<HourlyWeather> hourlyList = new ArrayList<>();
         HttpURLConnection connection = null;
         try {
             String tz = URLEncoder.encode(timezone, "UTF-8");
-            String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude
-                    + "&longitude=" + longitude
-                    + "&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code"
-                    + "&forecast_hours=24&timezone=" + tz;
+            String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code" + "&forecast_hours=24&timezone=" + tz;
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -103,27 +113,12 @@ public class ApiClient {
         }
         return hourlyList;
     }
-}
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-        return cities;
-    }
 
     public static CurrentWeather getCurrentWeather(double latitude, double longitude, String timezone) {
         HttpURLConnection connection = null;
         try {
             String tz = URLEncoder.encode(timezone, "UTF-8");
-            String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude
-                    + "&longitude=" + longitude
-                    + "&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m"
-                    + "&timezone=" + tz;
+            String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m" + "&timezone=" + tz;
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");

@@ -44,13 +44,7 @@ public class CitySelectionActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         listViewCities = findViewById(R.id.listViewCities);
 
-        adapter = new SimpleAdapter(
-                this,
-                listData,
-                R.layout.item_city,
-                new String[]{"name", "details"},
-                new int[]{R.id.tvCityName, R.id.tvCityDetails}
-        );
+        adapter = new SimpleAdapter(this, listData, R.layout.item_city, new String[]{"name", "details"}, new int[]{R.id.tvCityName, R.id.tvCityDetails});
         listViewCities.setAdapter(adapter);
 
         etSearch.addTextChangedListener(new TextWatcher() {

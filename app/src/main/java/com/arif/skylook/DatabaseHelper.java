@@ -24,12 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE " + TABLE_SELECTED_CITY + " (" +
-                COLUMN_ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_NAME + " TEXT, " +
-                COLUMN_COUNTRY + " TEXT, " +
-                COLUMN_LATITUDE + " REAL, " +
-                COLUMN_LONGITUDE + " REAL)";
+        String createTable = "CREATE TABLE " + TABLE_SELECTED_CITY + " (" + COLUMN_ID + " INTEGER PRIMARY KEY, " + COLUMN_NAME + " TEXT, " + COLUMN_COUNTRY + " TEXT, " + COLUMN_LATITUDE + " REAL, " + COLUMN_LONGITUDE + " REAL)";
         db.execSQL(createTable);
     }
 
@@ -55,11 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public City getSelectedCity() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_SELECTED_CITY,
-                new String[]{COLUMN_NAME, COLUMN_COUNTRY, COLUMN_LATITUDE, COLUMN_LONGITUDE},
-                COLUMN_ID + "=?",
-                new String[]{"1"},
-                null, null, null);
+        Cursor cursor = db.query(TABLE_SELECTED_CITY, new String[]{COLUMN_NAME, COLUMN_COUNTRY, COLUMN_LATITUDE, COLUMN_LONGITUDE}, COLUMN_ID + "=?", new String[]{"1"}, null, null, null);
 
         City city = null;
         if (cursor != null && cursor.moveToFirst()) {

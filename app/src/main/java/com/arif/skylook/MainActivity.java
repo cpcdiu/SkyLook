@@ -219,14 +219,18 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String[] parts = time.split("T");
                 if (parts.length > 1) {
-                    String hourPart = parts[1].substring(0, 2);
-                    int hour = Integer.parseInt(hourPart);
-                    String amPm = hour >= 12 ? "PM" : "AM";
-                    int hour12 = hour % 12;
-                    if (hour12 == 0) {
-                        hour12 = 12;
+                    String timePart = parts[1];
+                    String[] hm = timePart.split(":");
+                    if (hm.length >= 2) {
+                        int hour = Integer.parseInt(hm[0]);
+                        int minute = Integer.parseInt(hm[1]);
+                        String amPm = hour >= 12 ? "PM" : "AM";
+                        int hour12 = hour % 12;
+                        if (hour12 == 0) {
+                            hour12 = 12;
+                        }
+                        return String.format("%d:%02d %s", hour12, minute, amPm);
                     }
-                    return hour12 + " " + amPm;
                 }
             } catch (Exception e) {
                 e.printStackTrace();

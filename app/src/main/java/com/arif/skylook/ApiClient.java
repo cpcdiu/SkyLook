@@ -100,15 +100,26 @@ public class ApiClient {
                             int precipProb = precipProbs != null ? precipProbs.optInt(i, 0) : 0;
                             int code = codes != null ? codes.optInt(i, 0) : 0;
                             hourlyList.add(new HourlyWeather(time, temp, humidity, precipProb, code));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return hourlyList;
+    }
+
     public static List<DailyWeather> getDailyWeather(double latitude, double longitude, String timezone) {
         List<DailyWeather> dailyList = new ArrayList<>();
         HttpURLConnection connection = null;
         try {
             String tz = URLEncoder.encode(timezone, "UTF-8");
-            String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude
-                    + "&longitude=" + longitude
-                    + "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max"
-                    + "&forecast_days=5&timezone=" + tz;
+            String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max" + "&forecast_days=5&timezone=" + tz;
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -159,19 +170,6 @@ public class ApiClient {
             }
         }
         return dailyList;
-    }
-}
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-        return hourlyList;
     }
 
     public static CurrentWeather getCurrentWeather(double latitude, double longitude, String timezone) {

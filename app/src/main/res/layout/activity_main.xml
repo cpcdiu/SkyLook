@@ -265,6 +265,31 @@
                     android:orientation="horizontal" />
             </HorizontalScrollView>
 
+            <TextView
+                android:id="@+id/tvDailyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="5-Day Forecast"
+                android:textColor="@color/onBackground"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/progressBarDaily"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/dailyContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical" />
+
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

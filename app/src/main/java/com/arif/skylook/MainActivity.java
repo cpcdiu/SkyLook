@@ -29,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBarHourly;
     private LinearLayout hourlyContainer;
 
+    private ProgressBar progressBarDaily;
+    private LinearLayout dailyContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         tvDayNight = findViewById(R.id.tvDayNight);
         progressBarHourly = findViewById(R.id.progressBarHourly);
         hourlyContainer = findViewById(R.id.hourlyContainer);
+        progressBarDaily = findViewById(R.id.progressBarDaily);
+        dailyContainer = findViewById(R.id.dailyContainer);
 
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
         City city = databaseHelper.getSelectedCity();
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             tvCountryName.setText(city.getCountry());
             loadWeather(city);
             loadHourlyWeather(city);
+            loadDailyWeather(city);
         } else {
             progressBarWeather.setVisibility(View.GONE);
             tvError.setVisibility(View.VISIBLE);
@@ -112,6 +118,67 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }).start();
+    }
+
+    private void loadDailyWeather(City city) {
+        progressBarDaily.setVisibility(View.VISIBLE);
+        dailyContainer.removeAllViews();
+
+        String timezone = TimeZone.getDefault().getID();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<DailyWeather> dailyList = ApiClient.getDailyWeather(city.getLatitude(), city.getLongitude(), timezone);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBarDaily.setVisibility(View.GONE);
+                        if (dailyList != null && !dailyList.isEmpty()) {
+                            showDailyWeather(dailyList);
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void showDailyWeather(List<DailyWeather> dailyList) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (DailyWeather item : dailyList) {
+            View view = inflater.inflate(R.layout.item_daily_weather, dailyContainer, false);
+
+            TextView tvDailyDate = view.findViewById(R.id.tvDailyDate);
+            TextView tvDailyCondition = view.findViewById(R.id.tvDailyCondition);
+            TextView tvDailyTemp = view.findViewById(R.id.tvDailyTemp);
+            TextView tvDailyRain = view.findViewById(R.id.tvDailyRain);
+            TextView tvDailySun = view.findViewById(R.id.tvDailySun);
+
+            tvDailyDate.setText(formatDate(item.getDate()));
+            tvDailyCondition.setText(getWeatherCondition(item.getWeatherCode()));
+            tvDailyTemp.setText(String.format("%.0f° / %.0f°", item.getMaxTemp(), item.getMinTemp()));
+            tvDailyRain.setText("Rain: " + item.getPrecipitationProbabilityMax() + "%");
+            tvDailySun.setText("Sunrise " + formatHour(item.getSunrise()) + " • Sunset " + formatHour(item.getSunset()));
+
+            dailyContainer.addView(view);
+        }
+    }
+
+    private String formatDate(String date) {
+        try {
+            String[] parts = date.split("-");
+            if (parts.length == 3) {
+                int month = Integer.parseInt(parts[1]);
+                int day = Integer.parseInt(parts[2]);
+                String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+                if (month >= 1 && month <= 12) {
+                    return months[month - 1] + " " + day;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 
     private void showWeather(CurrentWeather weather) {

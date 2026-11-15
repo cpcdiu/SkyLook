@@ -100,7 +100,67 @@ public class ApiClient {
                             int precipProb = precipProbs != null ? precipProbs.optInt(i, 0) : 0;
                             int code = codes != null ? codes.optInt(i, 0) : 0;
                             hourlyList.add(new HourlyWeather(time, temp, humidity, precipProb, code));
+    public static List<DailyWeather> getDailyWeather(double latitude, double longitude, String timezone) {
+        List<DailyWeather> dailyList = new ArrayList<>();
+        HttpURLConnection connection = null;
+        try {
+            String tz = URLEncoder.encode(timezone, "UTF-8");
+            String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude
+                    + "&longitude=" + longitude
+                    + "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max"
+                    + "&forecast_days=5&timezone=" + tz;
+            URL url = new URL(apiUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream inputStream = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JSONObject jsonObject = new JSONObject(response.toString());
+                if (jsonObject.has("daily")) {
+                    JSONObject daily = jsonObject.getJSONObject("daily");
+                    JSONArray times = daily.optJSONArray("time");
+                    JSONArray codes = daily.optJSONArray("weather_code");
+                    JSONArray maxTemps = daily.optJSONArray("temperature_2m_max");
+                    JSONArray minTemps = daily.optJSONArray("temperature_2m_min");
+                    JSONArray sunrises = daily.optJSONArray("sunrise");
+                    JSONArray sunsets = daily.optJSONArray("sunset");
+                    JSONArray precipProbs = daily.optJSONArray("precipitation_probability_max");
+
+                    if (times != null) {
+                        for (int i = 0; i < times.length(); i++) {
+                            String date = times.optString(i, "");
+                            int code = codes != null ? codes.optInt(i, 0) : 0;
+                            double maxTemp = maxTemps != null ? maxTemps.optDouble(i, 0) : 0;
+                            double minTemp = minTemps != null ? minTemps.optDouble(i, 0) : 0;
+                            String sunrise = sunrises != null ? sunrises.optString(i, "") : "";
+                            String sunset = sunsets != null ? sunsets.optString(i, "") : "";
+                            int precipProb = precipProbs != null ? precipProbs.optInt(i, 0) : 0;
+                            dailyList.add(new DailyWeather(date, code, maxTemp, minTemp, sunrise, sunset, precipProb));
                         }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return dailyList;
+    }
+}
                     }
                 }
             }

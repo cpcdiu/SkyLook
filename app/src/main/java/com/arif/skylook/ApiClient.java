@@ -47,7 +47,63 @@ public class ApiClient {
                         double latitude = item.optDouble("latitude", 0);
                         double longitude = item.optDouble("longitude", 0);
                         cities.add(new City(name, country, latitude, longitude));
+    public static List<HourlyWeather> getHourlyWeather(double latitude, double longitude, String timezone) {
+        List<HourlyWeather> hourlyList = new ArrayList<>();
+        HttpURLConnection connection = null;
+        try {
+            String tz = URLEncoder.encode(timezone, "UTF-8");
+            String apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude
+                    + "&longitude=" + longitude
+                    + "&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code"
+                    + "&forecast_hours=24&timezone=" + tz;
+            URL url = new URL(apiUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream inputStream = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JSONObject jsonObject = new JSONObject(response.toString());
+                if (jsonObject.has("hourly")) {
+                    JSONObject hourly = jsonObject.getJSONObject("hourly");
+                    JSONArray times = hourly.optJSONArray("time");
+                    JSONArray temps = hourly.optJSONArray("temperature_2m");
+                    JSONArray humidities = hourly.optJSONArray("relative_humidity_2m");
+                    JSONArray precipProbs = hourly.optJSONArray("precipitation_probability");
+                    JSONArray codes = hourly.optJSONArray("weather_code");
+
+                    if (times != null) {
+                        for (int i = 0; i < times.length(); i++) {
+                            String time = times.optString(i, "");
+                            double temp = temps != null ? temps.optDouble(i, 0) : 0;
+                            int humidity = humidities != null ? humidities.optInt(i, 0) : 0;
+                            int precipProb = precipProbs != null ? precipProbs.optInt(i, 0) : 0;
+                            int code = codes != null ? codes.optInt(i, 0) : 0;
+                            hourlyList.add(new HourlyWeather(time, temp, humidity, precipProb, code));
+                        }
                     }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return hourlyList;
+    }
+}
                 }
             }
         } catch (Exception e) {

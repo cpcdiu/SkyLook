@@ -1,6 +1,7 @@
 package com.arif.skylook;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.List;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvWind;
     private TextView tvPrecipitation;
     private TextView tvDayNight;
+    private ProgressBar progressBarHourly;
+    private LinearLayout hourlyContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         tvWind = findViewById(R.id.tvWind);
         tvPrecipitation = findViewById(R.id.tvPrecipitation);
         tvDayNight = findViewById(R.id.tvDayNight);
+        progressBarHourly = findViewById(R.id.progressBarHourly);
+        hourlyContainer = findViewById(R.id.hourlyContainer);
 
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
         City city = databaseHelper.getSelectedCity();
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             tvCityName.setText(city.getName());
             tvCountryName.setText(city.getCountry());
             loadWeather(city);
+            loadHourlyWeather(city);
         } else {
             progressBarWeather.setVisibility(View.GONE);
             tvError.setVisibility(View.VISIBLE);
@@ -84,6 +91,29 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void loadHourlyWeather(City city) {
+        progressBarHourly.setVisibility(View.VISIBLE);
+        hourlyContainer.removeAllViews();
+
+        String timezone = TimeZone.getDefault().getID();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<HourlyWeather> hourlyList = ApiClient.getHourlyWeather(city.getLatitude(), city.getLongitude(), timezone);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBarHourly.setVisibility(View.GONE);
+                        if (hourlyList != null && !hourlyList.isEmpty()) {
+                            showHourlyWeather(hourlyList);
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
     private void showWeather(CurrentWeather weather) {
         weatherContainer.setVisibility(View.VISIBLE);
 
@@ -94,6 +124,37 @@ public class MainActivity extends AppCompatActivity {
         tvWind.setText(String.format("%.1f km/h", weather.getWindSpeed()));
         tvPrecipitation.setText(String.format("%.1f mm", weather.getPrecipitation()));
         tvDayNight.setText(weather.getIsDay() == 1 ? "Day" : "Night");
+    }
+
+    private void showHourlyWeather(List<HourlyWeather> hourlyList) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (HourlyWeather item : hourlyList) {
+            View view = inflater.inflate(R.layout.item_hourly_weather, hourlyContainer, false);
+
+            TextView tvHourTime = view.findViewById(R.id.tvHourTime);
+            TextView tvHourCondition = view.findViewById(R.id.tvHourCondition);
+            TextView tvHourTemp = view.findViewById(R.id.tvHourTemp);
+            TextView tvHourHumidity = view.findViewById(R.id.tvHourHumidity);
+            TextView tvHourPrecip = view.findViewById(R.id.tvHourPrecip);
+
+            tvHourTime.setText(formatHour(item.getTime()));
+            tvHourCondition.setText(getWeatherCondition(item.getWeatherCode()));
+            tvHourTemp.setText(String.format("%.1f°C", item.getTemperature()));
+            tvHourHumidity.setText("Humidity: " + item.getHumidity() + "%");
+            tvHourPrecip.setText("Rain: " + item.getPrecipitationProbability() + "%");
+
+            hourlyContainer.addView(view);
+        }
+    }
+
+    private String formatHour(String time) {
+        if (time != null && time.contains("T")) {
+            String[] parts = time.split("T");
+            if (parts.length > 1) {
+                return parts[1];
+            }
+        }
+        return time;
     }
 
     private String getWeatherCondition(int code) {

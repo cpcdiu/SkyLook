@@ -149,9 +149,20 @@ public class MainActivity extends AppCompatActivity {
 
     private String formatHour(String time) {
         if (time != null && time.contains("T")) {
-            String[] parts = time.split("T");
-            if (parts.length > 1) {
-                return parts[1];
+            try {
+                String[] parts = time.split("T");
+                if (parts.length > 1) {
+                    String hourPart = parts[1].substring(0, 2);
+                    int hour = Integer.parseInt(hourPart);
+                    String amPm = hour >= 12 ? "PM" : "AM";
+                    int hour12 = hour % 12;
+                    if (hour12 == 0) {
+                        hour12 = 12;
+                    }
+                    return hour12 + " " + amPm;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return time;

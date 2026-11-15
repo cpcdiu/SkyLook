@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SkyLook</string>
+    <string name="search_city_hint">Search city</string>
+    <string name="select_city_title">Select Your City</string>
+</resources>

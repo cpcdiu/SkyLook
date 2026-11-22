@@ -1,8 +1,10 @@
 package com.arif.skylook;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -81,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         };
-        cityHeader.setOnClickListener(editCityListener);
+        // cityHeader.setOnClickListener(editCityListener);
         btnEditCity.setOnClickListener(editCityListener);
     }
 

@@ -15,4 +15,7 @@
     <color name="onBackground">#FF161C1F</color>
     <color name="surface">#FFFFFFFF</color>
     <color name="onSurface">#FF161C1F</color>
+
+
+    <color name="ic_launcher_background">#FF0F3040</color>
 </resources>

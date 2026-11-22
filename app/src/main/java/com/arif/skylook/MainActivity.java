@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBarDaily;
     private LinearLayout dailyContainer;
 
+    private LinearLayout cityHeader;
+    private ImageButton btnEditCity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         tvCityName = findViewById(R.id.tvCityName);
         tvCountryName = findViewById(R.id.tvCountryName);
+        cityHeader = findViewById(R.id.cityHeader);
+        btnEditCity = findViewById(R.id.btnEditCity);
         progressBarWeather = findViewById(R.id.progressBarWeather);
         tvError = findViewById(R.id.tvError);
         weatherContainer = findViewById(R.id.weatherContainer);
@@ -68,6 +73,16 @@ public class MainActivity extends AppCompatActivity {
             tvError.setVisibility(View.VISIBLE);
             tvError.setText("No city selected");
         }
+
+        View.OnClickListener editCityListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CitySelectionActivity.class);
+                startActivity(intent);
+            }
+        };
+        cityHeader.setOnClickListener(editCityListener);
+        btnEditCity.setOnClickListener(editCityListener);
     }
 
     private void loadWeather(City city) {

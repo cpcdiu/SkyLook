@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBarWeather;
     private TextView tvError;
     private LinearLayout weatherContainer;
+    private ImageView ivWeatherIcon;
     private TextView tvTemperature;
     private TextView tvWeatherCondition;
     private TextView tvFeelsLike;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         progressBarWeather = findViewById(R.id.progressBarWeather);
         tvError = findViewById(R.id.tvError);
         weatherContainer = findViewById(R.id.weatherContainer);
+        ivWeatherIcon = findViewById(R.id.ivWeatherIcon);
         tvTemperature = findViewById(R.id.tvTemperature);
         tvWeatherCondition = findViewById(R.id.tvWeatherCondition);
         tvFeelsLike = findViewById(R.id.tvFeelsLike);
@@ -166,12 +169,14 @@ public class MainActivity extends AppCompatActivity {
             View view = inflater.inflate(R.layout.item_daily_weather, dailyContainer, false);
 
             TextView tvDailyDate = view.findViewById(R.id.tvDailyDate);
+            ImageView ivDailyWeatherIcon = view.findViewById(R.id.ivDailyWeatherIcon);
             TextView tvDailyCondition = view.findViewById(R.id.tvDailyCondition);
             TextView tvDailyTemp = view.findViewById(R.id.tvDailyTemp);
             TextView tvDailyRain = view.findViewById(R.id.tvDailyRain);
             TextView tvDailySun = view.findViewById(R.id.tvDailySun);
 
             tvDailyDate.setText(formatDate(item.getDate()));
+            ivDailyWeatherIcon.setImageResource(WeatherIconHelper.getWeatherIconResource(item.getWeatherCode()));
             tvDailyCondition.setText(getWeatherCondition(item.getWeatherCode()));
             tvDailyTemp.setText(String.format("%.0f° / %.0f°", item.getMaxTemp(), item.getMinTemp()));
             tvDailyRain.setText("Rain: " + item.getPrecipitationProbabilityMax() + "%");
@@ -201,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
     private void showWeather(CurrentWeather weather) {
         weatherContainer.setVisibility(View.VISIBLE);
 
+        ivWeatherIcon.setImageResource(WeatherIconHelper.getWeatherIconResource(weather.getWeatherCode()));
         tvTemperature.setText(String.format("%.1f°C", weather.getTemperature()));
         tvWeatherCondition.setText(getWeatherCondition(weather.getWeatherCode()));
         tvFeelsLike.setText(String.format("Feels like %.1f°C", weather.getApparentTemperature()));
@@ -216,12 +222,14 @@ public class MainActivity extends AppCompatActivity {
             View view = inflater.inflate(R.layout.item_hourly_weather, hourlyContainer, false);
 
             TextView tvHourTime = view.findViewById(R.id.tvHourTime);
+            ImageView ivHourWeatherIcon = view.findViewById(R.id.ivHourWeatherIcon);
             TextView tvHourCondition = view.findViewById(R.id.tvHourCondition);
             TextView tvHourTemp = view.findViewById(R.id.tvHourTemp);
             TextView tvHourHumidity = view.findViewById(R.id.tvHourHumidity);
             TextView tvHourPrecip = view.findViewById(R.id.tvHourPrecip);
 
             tvHourTime.setText(formatHour(item.getTime()));
+            ivHourWeatherIcon.setImageResource(WeatherIconHelper.getWeatherIconResource(item.getWeatherCode()));
             tvHourCondition.setText(getWeatherCondition(item.getWeatherCode()));
             tvHourTemp.setText(String.format("%.1f°C", item.getTemperature()));
             tvHourHumidity.setText("Humidity: " + item.getHumidity() + "%");

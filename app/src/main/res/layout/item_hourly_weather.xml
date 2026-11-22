@@ -22,11 +22,19 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
+        <ImageView
+            android:id="@+id/ivHourWeatherIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="6dp"
+            android:contentDescription="Weather condition icon"
+            android:src="@drawable/ic_weather_clear" />
+
         <TextView
             android:id="@+id/tvHourTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:textColor="@color/primary"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -35,7 +43,7 @@
             android:id="@+id/tvHourCondition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:gravity="center"
             android:textColor="@color/onSurface"
             android:textSize="13sp" />
@@ -44,7 +52,7 @@
             android:id="@+id/tvHourHumidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:textColor="@color/onSurface"
             android:textSize="12sp" />
 
